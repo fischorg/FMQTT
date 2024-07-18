@@ -25,11 +25,11 @@
     <IsPackable>true</IsPackable>
     <PackageId>fischorg.FMQTT</PackageId>
     <Title>fischorg.FMQTT</Title>
-    <VersionPrefix>1.0.3</VersionPrefix>
+    <VersionPrefix>1.0.4</VersionPrefix>
     <Description>
       Wrapper library around MQTTnet for use in F# projects
     </Description>
-    <RepositoryUrl>https://github.com/westerncapital/fmqtt</RepositoryUrl>
+    <RepositoryUrl>https://github.com/fischorg/fmqtt</RepositoryUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
   <ItemGroup>
