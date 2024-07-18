@@ -23,14 +23,14 @@
   </PropertyGroup>-->
   <PropertyGroup>
     <IsPackable>true</IsPackable>
-    <PackageId>FischGeek.FMQTT</PackageId>
-    <Title>FischGeek.FMQTT</Title>
+    <PackageId>FischOrg.FMQTT</PackageId>
+    <Title>FischOrg.FMQTT</Title>
     <VersionPrefix>1.0.0</VersionPrefix>
     <Description>
       Wrapper library around MQTTnet for use in F# projects
     </Description>
     <RepositoryUrl>https://github.com/westerncapital/fmqtt</RepositoryUrl>
-    <!--<PackageReadmeFile>README.md</PackageReadmeFile>-->
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
   <ItemGroup>
     <None Include="paket.references" />
