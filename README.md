@@ -1,2 +1,3 @@
-# FMQTT
-An simple F# wrapper for MQTTnet
+## FMQTT
+
+Wrapper library around MQTTnet for use in F# projects
