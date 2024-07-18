@@ -23,8 +23,8 @@
   </PropertyGroup>-->
   <PropertyGroup>
     <IsPackable>true</IsPackable>
-    <PackageId>FischOrg.FMQTT</PackageId>
-    <Title>FischOrg.FMQTT</Title>
+    <PackageId>fishorg.FMQTT</PackageId>
+    <Title>fishorg.FMQTT</Title>
     <VersionPrefix>1.0.0</VersionPrefix>
     <Description>
       Wrapper library around MQTTnet for use in F# projects
