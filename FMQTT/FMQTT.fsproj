@@ -23,9 +23,9 @@
   </PropertyGroup>-->
   <PropertyGroup>
     <IsPackable>true</IsPackable>
-    <PackageId>fishorg.FMQTT</PackageId>
-    <Title>fishorg.FMQTT</Title>
-    <VersionPrefix>1.0.2</VersionPrefix>
+    <PackageId>fischorg.FMQTT</PackageId>
+    <Title>fischorg.FMQTT</Title>
+    <VersionPrefix>1.0.3</VersionPrefix>
     <Description>
       Wrapper library around MQTTnet for use in F# projects
     </Description>
