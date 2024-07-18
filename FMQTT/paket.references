@@ -1,5 +1,5 @@
 ﻿FSharp.Core
 MQTTnet
 System.Text.Json
-System.Runtime.CompilerServices.Unsafe
-System.Text.Encodings.Web
+#System.Runtime.CompilerServices.Unsafe
+#System.Text.Encodings.Web
