@@ -2,5 +2,5 @@ source https://api.nuget.org/v3/index.json
 storage: none
 
 nuget FSharp.Core
-nuget MQTTnet
+nuget MQTTnet < 5
 nuget System.Text.Json
