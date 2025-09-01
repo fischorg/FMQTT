@@ -23,6 +23,5 @@ module Settings =
     let MakeToggler = FMQTT.Togglers.MakeTogglerBase mqtt.Value
 
     let CreateRetainedBool (onChange: _ -> unit) defaultValue topic =
-        //mqtt.Value.EnsureConnected()
         let v = mqtt.Value
         MQTTObservable.CreateRetainedBool v onChange defaultValue topic

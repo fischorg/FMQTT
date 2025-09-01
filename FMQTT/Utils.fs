@@ -1,10 +1,13 @@
 module internal Utils
-    open ExceptionalCode
-    open FMQTT.AtomicOperators
-    open FMQTT
+    //Op: Auto
     open System
     open System.Collections.Generic
     open System.Diagnostics
+
+    open FMQTT.AtomicOperators
+
+    open ExceptionalCode
+    //Op: End
 
     let Trim(text: string): string =
         if isNull text then ""
@@ -31,7 +34,6 @@ module internal Utils
         if isNull x then ""
         else x
 
-
     let RunProcessStartInfoWithOutputFullest timeout (onOutput: (string -> unit) option) (onError: (string -> unit) option) (cleanOut: string list -> string list) (procStartInfo: ProcessStartInfo) =
         let timeout =
             if timeout = 0 then Int32.MaxValue else timeout
@@ -56,13 +58,10 @@ module internal Utils
             try
                 p.Start()
             with ex ->
-                //ProcessStartInfoPipe.ToRunnableString procStartInfo
-                //|> noop
                 ex.Data.Add("filename", procStartInfo.FileName)
                 reraise ()
 
         if not started then failwithf $"Failed to start process %s{procStartInfo.FileName}"
-        //printfn "Started %s %s with pid %i" procStartInfo.FileName procStartInfo.Arguments p.Id
 
         p.BeginOutputReadLine()
         p.BeginErrorReadLine()
@@ -73,7 +72,6 @@ module internal Utils
             raise ex
 
         timer.Stop()
-        //printfn "Finished %s after %i milliseconds" procStartInfo.FileName timer.ElapsedMilliseconds
         let remBlanks l =
             l
             |?| (String.IsNullOrEmpty >> not)

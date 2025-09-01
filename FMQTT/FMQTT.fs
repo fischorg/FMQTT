@@ -6,20 +6,19 @@ open System.Diagnostics
 open System.Threading
 open System.Threading.Tasks
 
-open ExceptionalCode
-open Utils
-
-open MQTTnet
 open MQTTnet.Client
 open MQTTnet.Protocol
+
+open ExceptionalCode
+open MQTTnet
+open Utils
 //Op: End
 [<AutoOpen>]
 module FMQTTCore =
     let (|AsPayloadString|) (x: MqttApplicationMessageReceivedEventArgs) =
         x.ApplicationMessage.PayloadSegment
         |> ToArray
-        //x.ApplicationMessage.Payload
-        //|> System.Text.Encoding.ASCII.GetString
+
     [<Obsolete("Please update this operator to |& to avoid order of operations bugs")>]
     let (|--) a b = a |> tee b
 
@@ -88,13 +87,6 @@ module FMQTTCore =
                 EventHandlers_ = new System.Collections.Concurrent.ConcurrentDictionary<string, List<MqttApplicationMessageReceivedEventArgs -> unit>>()
                 //Op: End
             }
-            //|-- fun x ->
-            //        x.Client.add_ApplicationMessageReceivedAsync(fun (xx: MqttApplicationMessageReceivedEventArgs) ->
-            //            if x.EventHandlers.ContainsKey xx.ApplicationMessage.Topic then
-            //                x.EventHandlers.[xx.ApplicationMessage.Topic]
-            //                |> Seq.iter (fun q -> q xx)
-            //            Task.CompletedTask
-            //        )
             |& fun x ->
                     x.Client.add_ApplicationMessageReceivedAsync(fun (eventArgs: MqttApplicationMessageReceivedEventArgs) ->
                         if x.EventHandlers_.ContainsKey eventArgs.ApplicationMessage.Topic then
@@ -117,57 +109,12 @@ module FMQTTCore =
         static member UseTLS (mq: MqttConnection) =
             {
                 mq with
-                    //OptionsBuilder = mq.OptionsBuilder.WithTls()
                     OptionsBuilder =
                         let q = new MqttClientTlsOptions()
                         q.UseTls <- true
                         mq.OptionsBuilder.WithTlsOptions(q)
             }
-        //static member UseTLS (mq: MqttConnection) = {mq with OptionsBuilder = mq.OptionsBuilder.WithTls()}
         static member WithQOS qos (mq: MqttConnection) = {mq with OptionsBuilder = mq.OptionsBuilder.WithWillQualityOfServiceLevel qos}
-
-        //member this.EnsureConnected() =
-        //    let rec connect depth mq =
-        //        depth >--> $"Depth {this.GUID} [{this.Status}]" |> fun (x: string) -> Console.WriteLine(x)
-
-        //        while this.Status = MqttConnectionStatus.Connecting do
-        //            depth >--> $"Depth {this.GUID} [{this.Status}]" |> fun (x: string) -> Console.WriteLine(x)
-        //            sleep 100
-        //        if this.Status = MqttConnectionStatus.New then
-        //            this.Status <- MqttConnectionStatus.Connecting
-        //            let _ = mq.Client.IsConnected
-        //            if depth > 50 then failwith "Not that deep"
-        //            //depth >--> $"Depth {this.GUID}" |> fun (x: string) -> Console.WriteLine(x)
-        //            try
-        //                let q = mq.Client.ConnectAsync(mq.OptionsBuilder.Build(), CancellationToken.None).Wait()
-        //                this.Status <- MqttConnectionStatus.Connected
-        //                depth >--> $"Depth {this.GUID} [{this.Status}]" |> fun (x: string) -> Console.WriteLine(x)
-        //                let r = 5
-        //                ()
-        //            with ex ->
-        //                match ex with
-        //                | :? AggregateException as ex ->
-        //                    ex.InnerExceptions
-        //                    |> Seq.tryPick
-        //                        ^ function
-        //                            | :? InvalidOperationException as ex when ex.Message = "Not allowed to connect while connect/disconnect is pending." -> Some depth
-        //                            | _ -> None
-        //                    |> function
-        //                    | Some depth ->
-        //                        Thread.Sleep 100
-        //                        depth + 1
-        //                    | None -> depth + 1
-        //                | _ -> depth + 1
-        //                |> fun (newDepth: int) ->
-        //                    if newDepth < 10 then
-        //                        Thread.Sleep 100
-        //                        connect newDepth mq
-        //    if not this.Client.IsConnected then
-        //        try
-        //            connect 0 this
-        //        with ex ->
-        //            ex.Message |> Console.WriteLine
-        //            ()
 
         member this.EnsureConnected() =
             let rec connect depth mq =
@@ -221,6 +168,7 @@ module FMQTTCore =
 
         member private this.AddEvent model =
             this.AddEventBase model.Topic (fun m -> m.ApplicationMessage.ConvertPayloadToString() |> model.OnChangeWeak)
+
         member this.SubscribeToTopicWithModel (model: ClientModel<_>) =
             let subOptions =
                 this.Factory.CreateSubscribeOptionsBuilder()
@@ -476,101 +424,3 @@ module FMQTTCore =
                 onChange
                 defaultValue
                 topic
-
-    //let CreateRetainedBool (mqtt: Lazy<MqttConnection>) (onChange: _ -> unit) defaultValue topic =
-    //    //mqtt.Value.EnsureConnected()
-    //    let v = mqtt.Value
-    //    MQTTObservable.CreateRetainedBool v onChange defaultValue topic
-
-
-    //type DiskObservableGeneric<'a when 'a: equality> internal (topic) =
-    //    inherit ObservableGeneric<'a>()
-    //    member this.DiskFile() = $@"c:\temp\mqtt\%s{topic |> FilePipe.CoerceValidFileName}"
-    //    member val callback : 'a -> unit = ignore with get, set
-    //    member this.Publish()=
-    //        let dx = new FileInfo(this.DiskFile())
-    //        if dx.Directory.Exists |> not then
-    //            dx.Directory.Create()
-    //        IO.File.WriteAllText(this.DiskFile(), this.backingValue.Value |> this.serializer)
-    //    override this.Value
-    //        with get() : 'a =
-    //            try
-    //                IO.File.ReadAllText (this.DiskFile())
-    //                |> this.deserializer
-    //            with ex ->
-    //                this.initVal.Value
-    //                |> this.SetValue
-    //                this.Value
-
-    //        and set(newValue: 'a) =
-    //            this.SetBackingValue newValue
-    //            this.Publish()
-    //            this.callback newValue
-
-    //    static member Create (serialize: 'a -> string) (deserialize: string -> 'a) cb (defaultValue: 'a) topic =
-    //        let ob = new DiskObservableGeneric<'a>(topic)
-    //        ob.serializer <- serialize
-    //        ob.deserializer <- deserialize
-    //        ob.initVal <- Some defaultValue
-    //        ob.callback <- cb
-    //        ob.Value |> ignore
-    //        ob
-
-    //    static member CreateRetained<'a> (serialize: 'a -> string) (deserialize: string -> 'a) cb (defaultValue: 'a) (topic: string) : DiskObservableGeneric<'a> =
-    //        DiskObservableGeneric.Create serialize deserialize cb defaultValue topic
-
-    //type DiskObservable =
-    //    static member private CreateWithSerializers s d cb defaultValue topic : DiskObservableGeneric<_> =
-    //        DiskObservableGeneric.CreateRetained
-    //            s
-    //            d
-    //            cb
-    //            defaultValue
-    //            topic
-
-    //    static member CreateRetainedString cb defaultValue topic : DiskObservableGeneric<string> =
-    //        DiskObservable.CreateWithSerializers
-    //            id
-    //            id
-    //            cb
-    //            defaultValue
-    //            topic
-
-    //    static member CreateRetainedInt cb defaultValue topic : DiskObservableGeneric<int> =
-    //        DiskObservable.CreateWithSerializers
-    //            (fun i -> i.ToString())
-    //            (fun i ->
-    //                System.Int32.TryParse i
-    //                |> function
-    //                | true, i -> i
-    //                | false, _ -> 0)
-    //            cb
-    //            defaultValue
-    //            topic
-
-    //    static member CreateRetainedStringList cb topic : DiskObservableGeneric<System.Collections.Generic.List<string>> =
-    //        let newList = new System.Collections.Generic.List<string>()
-    //        DiskObservable.CreateWithSerializers
-    //            System.Text.Json.JsonSerializer.Serialize
-    //            (fun x ->
-    //                if (ns x) = "" then
-    //                    newList
-    //                else
-    //                    System.Text.Json.JsonSerializer.Deserialize<System.Collections.Generic.List<string>> x
-    //            )
-    //            cb
-    //            newList
-    //            topic
-
-    //    static member CreateRetainedBool (onChange: bool -> unit) defaultValue topic : DiskObservableGeneric<bool> =
-    //        DiskObservable.CreateWithSerializers
-    //            (fun (x: bool) -> x.ToString())
-    //            (fun s ->
-    //                System.Boolean.TryParse s
-    //                |> function
-    //                | true, x -> x
-    //                | false, _ -> false
-    //                )
-    //            onChange
-    //            defaultValue
-    //            topic
